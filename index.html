@@ -383,7 +383,8 @@
   const STORAGE_KEY = "garage-car-maintenance-v1";
   const THEME_KEY = "garage-theme";
   const TIP_KEY = "garage-install-tip-dismissed";
-  const SEED_VERSION = 2;
+  const SEED_VERSION = 3;
+  const REMOVED_CAR_IDS = ["car-ml350"];
   const KM_PER_MILE = 1.60934;
   const LEGACY_NOTES = {
     "car-ridgeline": ["Service history not yet available."]
@@ -1320,45 +1321,6 @@
           "cost": null
         }
       ]
-    },
-    {
-      "id": "car-ml350",
-      "name": "2012 Mercedes ML350 (USA)",
-      "oilIntervalKm": 8000,
-      "specs": "",
-      "notes": "",
-      "services": [
-        {
-          "id": "svc-ml-2024-01",
-          "date": "2024-01-01",
-          "type": "Oil Change",
-          "shop": "",
-          "km": 234266,
-          "unit": "km",
-          "notes": "",
-          "cost": null
-        },
-        {
-          "id": "svc-ml-2024-02",
-          "date": "2024-02-01",
-          "type": "Oil Change",
-          "shop": "",
-          "km": 239000,
-          "unit": "km",
-          "notes": "",
-          "cost": null
-        },
-        {
-          "id": "svc-ml-2024-04",
-          "date": "2024-04-01",
-          "type": "Oil Change",
-          "shop": "",
-          "km": 244500,
-          "unit": "km",
-          "notes": "",
-          "cost": null
-        }
-      ]
     }
   ]
 };
@@ -1412,7 +1374,7 @@
       mergedCars.push(ex);
     });
     (data.cars || []).forEach(function (c) {
-      if (!seedIds[c.id]) mergedCars.push(c);
+      if (!seedIds[c.id] && REMOVED_CAR_IDS.indexOf(c.id) === -1) mergedCars.push(c);
     });
     data.cars = mergedCars;
     data.seedVersion = SEED_VERSION;

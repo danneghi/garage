@@ -228,6 +228,7 @@
       background: var(--surface-2);
     }
     .btn:active { transform: scale(0.98); }
+    .btn svg { width: 18px; height: 18px; flex: none; }
     .btn-primary {
       background: var(--gold);
       color: #1a1408;
@@ -246,6 +247,16 @@
     .btn-row.inline .btn { flex: 1; }
 
     .fab-wrap { margin-top: 16px; }
+    .part-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .part-head .price { font-weight: 650; white-space: nowrap; font-size: 14px; }
+    .parts-total {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+      background: var(--surface); border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; font-size: 13px;
+    }
+    .parts-total .lbl { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 600; }
+    .parts-total .val { font-weight: 650; text-align: right; }
+    .curr-row { display: flex; gap: 18px; }
 
     .sheet-backdrop, .modal-backdrop {
       position: fixed; inset: 0;
@@ -383,7 +394,7 @@
   const STORAGE_KEY = "garage-car-maintenance-v1";
   const THEME_KEY = "garage-theme";
   const TIP_KEY = "garage-install-tip-dismissed";
-  const SEED_VERSION = 3;
+  const SEED_VERSION = 4;
   const REMOVED_CAR_IDS = ["car-ml350"];
   const KM_PER_MILE = 1.60934;
   const LEGACY_NOTES = {
@@ -1325,6 +1336,486 @@
   ]
 };
 
+  const SEED_PARTS = {
+  "car-ridgeline": [
+    {
+      "id": "part-ridgeline-2018-03-21-tckwp329",
+      "date": "2018-03-21",
+      "name": "ACDelco timing belt + water pump kit",
+      "partNumber": "TCKWP329",
+      "qty": 1,
+      "price": 185.87,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "81066307",
+      "notes": "Less 9.29 discount"
+    },
+    {
+      "id": "part-ridgeline-2018-03-24-9299",
+      "date": "2018-03-24",
+      "name": "Anchor motor mount",
+      "partNumber": "9299",
+      "qty": 1,
+      "price": 28.14,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "81281701",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2018-03-24-es713291",
+      "date": "2018-03-24",
+      "name": "Fel-Pro cylinder head bolts",
+      "partNumber": "ES713291",
+      "qty": 2,
+      "price": 58.86,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "81281701",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2018-04-03-73040",
+      "date": "2018-04-03",
+      "name": "Fel-Pro oil filter adapter gasket",
+      "partNumber": "73040",
+      "qty": 1,
+      "price": 7.2,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "81951840",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2018-07-06-thh009",
+      "date": "2018-07-06",
+      "name": "Aisin thermostat",
+      "partNumber": "THH009",
+      "qty": 1,
+      "price": 17.81,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "88478832",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-03-02-reartaillightdriverside",
+      "date": "2019-03-02",
+      "name": "Rear tail light, driver side",
+      "partNumber": "",
+      "qty": 1,
+      "price": 54.43,
+      "currency": "USD",
+      "store": "eBay (carlights360)",
+      "order": "HO2818131",
+      "notes": "eBay item 223279529753. Total charged 74.16 incl. shipping/import"
+    },
+    {
+      "id": "part-ridgeline-2019-08-10-1331634r",
+      "date": "2019-08-10",
+      "name": "FCS strut assembly, right",
+      "partNumber": "1331634R",
+      "qty": 1,
+      "price": 112.38,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "117664529",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-08-10-1331634l",
+      "date": "2019-08-10",
+      "name": "FCS strut assembly, left",
+      "partNumber": "1331634L",
+      "qty": 1,
+      "price": 113.71,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "117664529",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-08-10-rk621546",
+      "date": "2019-08-10",
+      "name": "Ultra-Power control arm",
+      "partNumber": "RK621546",
+      "qty": 1,
+      "price": 68.64,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "117664529",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-08-10-rk621545",
+      "date": "2019-08-10",
+      "name": "Ultra-Power control arm",
+      "partNumber": "RK621545",
+      "qty": 1,
+      "price": 71.29,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "117664529",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-08-21-ms60864",
+      "date": "2019-08-21",
+      "name": "Mevotech stabilizer bar links",
+      "partNumber": "MS60864",
+      "qty": 2,
+      "price": 40.82,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "118594399",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2019-10-05-3657",
+      "date": "2019-10-05",
+      "name": "NGK spark plugs",
+      "partNumber": "3657",
+      "qty": 6,
+      "price": 67.32,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "122205032",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2020-01-27-13959",
+      "date": "2020-01-27",
+      "name": "Bosch oxygen sensor",
+      "partNumber": "13959",
+      "qty": 1,
+      "price": 47.1,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "130295654",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2020-01-27-egv658",
+      "date": "2020-01-27",
+      "name": "SMP EGR valve",
+      "partNumber": "EGV658",
+      "qty": 1,
+      "price": 69.47,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "130295654",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2021-04-01-ho35k3",
+      "date": "2021-04-01",
+      "name": "EngineTech engine gasket set",
+      "partNumber": "HO35K3",
+      "qty": 1,
+      "price": 129.7,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "171135053",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2021-04-15-3657",
+      "date": "2021-04-15",
+      "name": "NGK spark plugs",
+      "partNumber": "3657",
+      "qty": 6,
+      "price": 65.7,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "172570194",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2021-05-04-2345010",
+      "date": "2021-05-04",
+      "name": "Denso oxygen sensors",
+      "partNumber": "234-5010",
+      "qty": 2,
+      "price": 213.34,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "174399965",
+      "notes": "Less 10.67 discount"
+    },
+    {
+      "id": "part-ridgeline-2021-05-09-ma0199",
+      "date": "2021-05-09",
+      "name": "NTK MAP sensor",
+      "partNumber": "MA0199",
+      "qty": 1,
+      "price": 64.07,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "174894976",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-04-04-cms601019",
+      "date": "2023-04-04",
+      "name": "Mevotech control arm",
+      "partNumber": "CMS601019",
+      "qty": 1,
+      "price": 49.42,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "235208243",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-04-04-cms601020",
+      "date": "2023-04-04",
+      "name": "Mevotech control arm",
+      "partNumber": "CMS601020",
+      "qty": 1,
+      "price": 49.42,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "235208243",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-04-15-k750110",
+      "date": "2023-04-15",
+      "name": "Ultra-Power sway bar link",
+      "partNumber": "K750110",
+      "qty": 1,
+      "price": 6.95,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "236283508",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-04-15-k750111",
+      "date": "2023-04-15",
+      "name": "Ultra-Power sway bar link",
+      "partNumber": "K750111",
+      "qty": 1,
+      "price": 6.92,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "236283508",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-05-08-tkh002",
+      "date": "2023-05-08",
+      "name": "Aisin timing belt + water pump kit",
+      "partNumber": "TKH002",
+      "qty": 1,
+      "price": 259.1,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "238615765",
+      "notes": "Less 13.37 rebate"
+    },
+    {
+      "id": "part-ridgeline-2023-05-08-bc1103",
+      "date": "2023-05-08",
+      "name": "Bosch brake pads",
+      "partNumber": "BC1103",
+      "qty": 1,
+      "price": 35.82,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "238615765",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-05-11-tckwp329",
+      "date": "2023-05-11",
+      "name": "ACDelco timing belt + water pump kit",
+      "partNumber": "TCKWP329",
+      "qty": 1,
+      "price": 225.86,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "238865971",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-05-11-an0104",
+      "date": "2023-05-11",
+      "name": "NTK ambient air temp sensor",
+      "partNumber": "AN0104",
+      "qty": 1,
+      "price": 43.88,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "238865971",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-05-19-664225",
+      "date": "2023-05-19",
+      "name": "Cardone CV axle",
+      "partNumber": "664225",
+      "qty": 1,
+      "price": 76.64,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "239717254",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2023-05-19-604295",
+      "date": "2023-05-19",
+      "name": "Cardone CV axle",
+      "partNumber": "604295",
+      "qty": 1,
+      "price": 84.74,
+      "currency": "CAD",
+      "store": "RockAuto",
+      "order": "239717254",
+      "notes": ""
+    },
+    {
+      "id": "part-ridgeline-2025-08-03-specialtecaa5w205l",
+      "date": "2025-08-03",
+      "name": "Liqui Moly Special Tec AA 5W-20, 5L",
+      "partNumber": "",
+      "qty": 1,
+      "price": 46.24,
+      "currency": "CAD",
+      "store": "Amazon.ca",
+      "order": "701-1462368-5391446",
+      "notes": "Amazon showed a problem with this order"
+    },
+    {
+      "id": "part-ridgeline-2025-11-29-24570r17",
+      "date": "2025-11-29",
+      "name": "Nokian Outpost NAT tires",
+      "partNumber": "245/70R17",
+      "qty": 2,
+      "price": 562.32,
+      "currency": "CAD",
+      "store": "Kal Tire",
+      "order": "630962938",
+      "notes": "Plus install 60, TPMS 9.84, levy 10; invoice total 675.52. Appointment Dec 3, 2025"
+    }
+  ],
+  "car-tundra": [
+    {
+      "id": "part-tundra-2026-05-11-electricrunningboardscre",
+      "date": "2026-05-11",
+      "name": "Yota Xpedition electric running boards (CrewMax)",
+      "partNumber": "",
+      "qty": 1,
+      "price": null,
+      "currency": "CAD",
+      "store": "Yota Xpedition",
+      "order": "YX113634",
+      "notes": ""
+    },
+    {
+      "id": "part-tundra-2026-06-28-yx010511",
+      "date": "2026-06-28",
+      "name": "Yota Xpedition LED DRL vent lights",
+      "partNumber": "YX010511",
+      "qty": 1,
+      "price": null,
+      "currency": "CAD",
+      "store": "Yota Xpedition",
+      "order": "YX122884",
+      "notes": "Was backordered"
+    },
+    {
+      "id": "part-tundra-2026-11-12-frontrecoverypointsred",
+      "date": "2026-11-12",
+      "name": "NYTOP front recovery points (red)",
+      "partNumber": "",
+      "qty": 1,
+      "price": 183.99,
+      "currency": "USD",
+      "store": "Tundra Lifestyle",
+      "order": "26169",
+      "notes": "Total 195.03 with tax"
+    }
+  ],
+  "car-bmw-530xi": [
+    {
+      "id": "part-bmw-2026-03-10-0161074",
+      "date": "2026-03-10",
+      "name": "Beck/Arnley valve cover bolt",
+      "partNumber": "016-1074",
+      "qty": 1,
+      "price": 22.89,
+      "currency": "USD",
+      "store": "RockAuto",
+      "order": "339479407",
+      "notes": ""
+    },
+    {
+      "id": "part-bmw-2026-03-10-vs50860r",
+      "date": "2026-03-10",
+      "name": "Fel-Pro valve cover gasket",
+      "partNumber": "VS50860R",
+      "qty": 1,
+      "price": 33.79,
+      "currency": "USD",
+      "store": "RockAuto",
+      "order": "339479407",
+      "notes": ""
+    }
+  ],
+  "car-allroad": [
+    {
+      "id": "part-allroad-2022-02-24-306275",
+      "date": "2022-02-24",
+      "name": "GKN CV joint",
+      "partNumber": "306275",
+      "qty": 1,
+      "price": 274.99,
+      "currency": "USD",
+      "store": "FCP Euro",
+      "order": "R903292170",
+      "notes": "Probably this car (FCP order for Audi)"
+    },
+    {
+      "id": "part-allroad-2022-02-24-06j115403qkt2",
+      "date": "2022-02-24",
+      "name": "Liqui Moly oil change kit",
+      "partNumber": "06J115403QKT2",
+      "qty": 2,
+      "price": 204.68,
+      "currency": "USD",
+      "store": "FCP Euro",
+      "order": "R903292170",
+      "notes": "Probably this car"
+    },
+    {
+      "id": "part-allroad-2022-11-07-p682m",
+      "date": "2022-11-07",
+      "name": "Water pump assembly",
+      "partNumber": "P682M",
+      "qty": 1,
+      "price": 378.05,
+      "currency": "CAD",
+      "store": "GermanParts.ca",
+      "order": "208512",
+      "notes": "Receipt filed in Allroad email folder"
+    },
+    {
+      "id": "part-allroad-2019-12-10-proscantoolaudivw",
+      "date": "2019-12-10",
+      "name": "OBDeleven Pro scan tool (Audi/VW)",
+      "partNumber": "",
+      "qty": 1,
+      "price": 125.99,
+      "currency": "CAD",
+      "store": "Amazon.ca",
+      "order": "702-8625079-5907408",
+      "notes": "Tool"
+    }
+  ]
+};
+  SEED.cars.forEach(function (c) { c.parts = (SEED_PARTS[c.id] || []).slice(); });
+
   let db = null;
   let menuOpen = false;
   let confirmState = null;
@@ -1370,6 +1861,12 @@
         if (es.date == null || es.date === "") {
           if (ss.date) es.date = ss.date;
         }
+      });
+      ex.parts = Array.isArray(ex.parts) ? ex.parts : [];
+      const partById = {};
+      ex.parts.forEach(function (pt) { partById[pt.id] = true; });
+      (sc.parts || []).forEach(function (sp) {
+        if (!partById[sp.id]) ex.parts.push(JSON.parse(JSON.stringify(sp)));
       });
       mergedCars.push(ex);
     });
@@ -1469,6 +1966,25 @@
     if (n === null || n === undefined || n === "") return "";
     return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(Number(n));
   }
+
+  function fmtPrice(n, cur) {
+    if (n === null || n === undefined || n === "" || Number.isNaN(Number(n))) return "price unknown";
+    const c = cur === "USD" ? "USD" : "CAD";
+    return new Intl.NumberFormat("en-CA", { style: "currency", currency: c, currencyDisplay: "narrowSymbol" }).format(Number(n)) + " " + c;
+  }
+
+  function sortedParts(car) {
+    return (car.parts || []).slice().sort(function (a, b) {
+      const ad = a.date || "";
+      const bd = b.date || "";
+      if (ad === bd) return 0;
+      if (!ad) return -1;
+      if (!bd) return 1;
+      return ad < bd ? 1 : -1;
+    });
+  }
+
+  function findPart(car, id) { return (car.parts || []).find(function (p) { return p.id === id; }); }
 
   function todayISO() {
     const d = new Date();
@@ -1582,6 +2098,8 @@
       if (parts[2] === "service" && parts[3] === "new") return { name: "service-edit", carId: carId, svcId: null };
       if (parts[2] === "service" && parts[3] && parts[4] === "edit") return { name: "service-edit", carId: carId, svcId: parts[3] };
       if (parts[2] === "service" && parts[3]) return { name: "service-edit", carId: carId, svcId: parts[3] };
+      if (parts[2] === "part" && parts[3] === "new") return { name: "part-edit", carId: carId, partId: null };
+      if (parts[2] === "part" && parts[3]) return { name: "part-edit", carId: carId, partId: parts[3] };
       return { name: "car", carId: carId };
     }
     return { name: "home" };
@@ -1693,6 +2211,35 @@
         }).join("") + "</div>"
       : '<div class="empty"><strong>No services yet</strong>Log an oil change, rotation, or other work.</div>';
 
+    const partsList = sortedParts(car);
+    const totals = {};
+    let unknown = 0;
+    partsList.forEach(function (pt) {
+      if (pt.price === null || pt.price === undefined || pt.price === "" || Number.isNaN(Number(pt.price))) { unknown++; return; }
+      const c = pt.currency === "USD" ? "USD" : "CAD";
+      totals[c] = (totals[c] || 0) + Number(pt.price);
+    });
+    const totalBits = Object.keys(totals).sort().map(function (c) { return fmtPrice(totals[c], c); });
+    if (unknown) totalBits.push(unknown + " price unknown");
+    const partsTotal = partsList.length
+      ? '<div class="parts-total"><span class="lbl">Total spent</span><span class="val">' + esc(totalBits.join(" · ")) + "</span></div>"
+      : "";
+    const partsHtml = partsList.length
+      ? '<div class="history">' + partsList.map(function (pt) {
+          const bits = [fmtDate(pt.date)];
+          if (pt.partNumber) bits.push("#" + pt.partNumber);
+          if (Number(pt.qty) > 1) bits.push("Qty " + pt.qty);
+          if (pt.store) bits.push(pt.store);
+          if (pt.order) bits.push("Order " + pt.order);
+          const note = pt.notes ? '<div class="notes">' + esc(pt.notes) + "</div>" : "";
+          return '<button class="service-row" type="button" data-action="open-part" data-car="' + esc(car.id) + '" data-id="' + esc(pt.id) + '">' +
+            '<div class="part-head"><div class="title">' + esc(pt.name) + '</div><div class="price">' + esc(fmtPrice(pt.price, pt.currency)) + "</div></div>" +
+            '<div class="meta">' + esc(bits.join(" · ")) + "</div>" +
+            note +
+            "</button>";
+        }).join("") + "</div>"
+      : '<div class="empty"><strong>No parts yet</strong>Log parts you bought for this car.</div>';
+
     return '<div class="page">' +
       '<header class="topbar">' +
       '<button class="back-label" type="button" data-action="home">' + ICONS.back + " Garage</button>" +
@@ -1713,6 +2260,9 @@
       '<div class="section-head"><h2>History</h2><span class="count">' + services.length + "</span></div>" +
       history +
       '<div class="fab-wrap"><button class="btn btn-primary" type="button" data-action="add-service" data-id="' + esc(car.id) + '">' + ICONS.plus + " Add service</button></div>" +
+      '<div class="section-head" style="margin-top:28px"><h2>Parts bought</h2><span class="count">' + partsList.length + "</span></div>" +
+      partsTotal + partsHtml +
+      '<div class="fab-wrap"><button class="btn" style="width:100%" type="button" data-action="add-part" data-id="' + esc(car.id) + '">' + ICONS.plus + " Add part</button></div>" +
       "</div>";
   }
 
@@ -1799,6 +2349,41 @@
       "</div></form></div>";
   }
 
+  function renderPartForm(carId, partId) {
+    const car = findCar(carId);
+    if (!car) return renderMissing();
+    const pt = partId ? findPart(car, partId) : null;
+    if (partId && !pt) return renderMissing();
+    const title = pt ? "Edit part" : "Add part";
+    const v = function (k, d) { return pt && pt[k] !== null && pt[k] !== undefined ? pt[k] : d; };
+    const cur = v("currency", "CAD") === "USD" ? "USD" : "CAD";
+    const back = "#/car/" + car.id;
+    const del = pt
+      ? '<button class="btn btn-danger" type="button" data-action="delete-part" data-car="' + esc(car.id) + '" data-id="' + esc(pt.id) + '">Delete part</button>'
+      : "";
+    return renderCar(carId) +
+      '<div class="sheet-backdrop" data-go="' + esc(back) + '">' +
+      '<form class="sheet" data-form="part" data-car="' + esc(car.id) + '" data-id="' + esc(pt ? pt.id : "") + '" data-stop="1">' +
+      '<div class="grab"></div><h2>' + title + "</h2>" +
+      '<div class="form-stack">' +
+      field("date", "Date", 'type="date"', v("date", todayISO())) +
+      field("name", "Part", 'type="text" required placeholder="Oil filter" autocomplete="off"', v("name", "")) +
+      field("partNumber", "Part number", 'type="text" placeholder="Optional" autocomplete="off"', v("partNumber", "")) +
+      field("qty", "Quantity", 'type="number" min="1" step="1" inputmode="numeric"', v("qty", 1)) +
+      field("price", "Total paid for this line", 'type="number" min="0" step="0.01" inputmode="decimal" placeholder="Optional"', v("price", "")) +
+      '<div class="field"><span>Currency</span><div class="unit-row curr-row">' +
+      '<label><input type="radio" name="currency" value="CAD"' + (cur === "CAD" ? " checked" : "") + "> CAD</label>" +
+      '<label><input type="radio" name="currency" value="USD"' + (cur === "USD" ? " checked" : "") + "> USD</label>" +
+      "</div></div>" +
+      field("store", "Store", 'type="text" placeholder="RockAuto, Amazon.ca…" autocomplete="off"', v("store", "")) +
+      field("order", "Order number", 'type="text" placeholder="Optional" autocomplete="off"', v("order", "")) +
+      field("notes", "Notes", 'rows="3" placeholder="Optional"', v("notes", ""), "textarea") +
+      "</div>" +
+      '<div class="btn-row"><button class="btn btn-primary" type="submit">Save</button>' +
+      '<button class="btn btn-ghost" type="button" data-action="nav" data-href="' + esc(back) + '">Cancel</button>' + del +
+      "</div></form></div>";
+  }
+
   function renderConfirm() {
     if (!confirmState) return "";
     return '<div class="modal-backdrop" data-action="confirm-no">' +
@@ -1822,6 +2407,8 @@
       html = (r.carId ? renderCar(r.carId) : renderHome()) + renderCarForm(r.carId);
     } else if (r.name === "service-edit") {
       html = renderServiceForm(r.carId, r.svcId);
+    } else if (r.name === "part-edit") {
+      html = renderPartForm(r.carId, r.partId);
     } else html = renderHome();
     html += renderConfirm();
     document.getElementById("app").innerHTML = html;
@@ -1865,7 +2452,7 @@
       go("#/car/" + id);
     } else {
       const newId = uid();
-      db.cars.push({ id: newId, name: name, oilIntervalKm: interval, specs: specs, notes: notes, services: [] });
+      db.cars.push({ id: newId, name: name, oilIntervalKm: interval, specs: specs, notes: notes, services: [], parts: [] });
       persist();
       go("#/car/" + newId);
     }
@@ -1897,6 +2484,59 @@
       rec.id = uid();
       car.services.push(rec);
     }
+    persist();
+    go("#/car/" + carId);
+  }
+
+  function onSubmitPart(form) {
+    const carId = form.getAttribute("data-car");
+    const car = findCar(carId);
+    if (!car) return;
+    const name = form.name.value.trim();
+    if (!name) return;
+    const qtyRaw = form.qty.value.trim();
+    const qty = qtyRaw === "" ? 1 : Number(qtyRaw);
+    if (Number.isNaN(qty) || qty < 1) return;
+    const priceRaw = form.price.value.trim();
+    const price = priceRaw === "" ? null : Number(priceRaw);
+    if (price !== null && (Number.isNaN(price) || price < 0)) return;
+    const curEl = form.querySelector('input[name="currency"]:checked');
+    const rec = {
+      date: form.date.value || null,
+      name: name,
+      partNumber: form.partNumber.value.trim(),
+      qty: qty,
+      price: price,
+      currency: curEl && curEl.value === "USD" ? "USD" : "CAD",
+      store: form.store.value.trim(),
+      order: form.order.value.trim(),
+      notes: form.notes.value.trim()
+    };
+    car.parts = Array.isArray(car.parts) ? car.parts : [];
+    const id = form.getAttribute("data-id");
+    if (id) {
+      const pt = findPart(car, id);
+      if (!pt) return;
+      Object.assign(pt, rec);
+    } else {
+      rec.id = "part-" + uid();
+      car.parts.push(rec);
+    }
+    persist();
+    go("#/car/" + carId);
+  }
+
+  async function deletePart(carId, partId) {
+    const car = findCar(carId);
+    if (!car) return;
+    const ok = await askConfirm({
+      title: "Delete this part?",
+      body: "This cannot be undone, except by importing a backup.",
+      danger: true,
+      label: "Delete"
+    });
+    if (!ok) return;
+    car.parts = (car.parts || []).filter(function (p) { return p.id !== partId; });
     persist();
     go("#/car/" + carId);
   }
@@ -2024,6 +2664,9 @@
     else if (action === "open-service") go("#/car/" + el.getAttribute("data-car") + "/service/" + id + "/edit");
     else if (action === "delete-car") deleteCar(id);
     else if (action === "delete-service") deleteService(el.getAttribute("data-car"), id);
+    else if (action === "add-part") go("#/car/" + id + "/part/new");
+    else if (action === "open-part") go("#/car/" + el.getAttribute("data-car") + "/part/" + id);
+    else if (action === "delete-part") deletePart(el.getAttribute("data-car"), id);
     else if (action === "toggle-theme") {
       const now = applyTheme();
       localStorage.setItem(THEME_KEY, now === "light" ? "dark" : "light");
@@ -2048,6 +2691,7 @@
     e.preventDefault();
     if (form.getAttribute("data-form") === "car") onSubmitCar(form);
     if (form.getAttribute("data-form") === "service") onSubmitService(form);
+    if (form.getAttribute("data-form") === "part") onSubmitPart(form);
   });
 
   document.getElementById("import-file").addEventListener("change", function (e) {

@@ -193,6 +193,13 @@
     .section-head .count { color: var(--text-dim); font-size: 13px; }
 
     .history { display: flex; flex-direction: column; gap: 8px; }
+    .year-group { margin: 0 0 18px; }
+    .year-group:last-child { margin-bottom: 0; }
+    .year-head {
+      font-size: 13px; font-weight: 650; color: var(--text-dim);
+      letter-spacing: 0.02em; margin: 0 0 8px; padding: 0 2px;
+    }
+    .year-head .yr { color: var(--text); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
     .service-row {
       display: flex; flex-direction: column; gap: 2px;
       text-align: left; width: 100%; color: inherit;
@@ -1995,6 +2002,51 @@
 
   function isOil(svc) { return /oil/i.test((svc && svc.type) || ""); }
 
+  function serviceYear(svc) {
+    const d = parseDate(svc && svc.date);
+    return d ? String(d.getFullYear()) : null;
+  }
+
+  function groupByYear(list) {
+    const groups = [];
+    const index = {};
+    list.forEach(function (svc) {
+      const y = serviceYear(svc) || "No date";
+      if (!index[y]) {
+        index[y] = { year: y, items: [] };
+        groups.push(index[y]);
+      }
+      index[y].items.push(svc);
+    });
+    groups.sort(function (a, b) {
+      if (a.year === "No date") return 1;
+      if (b.year === "No date") return -1;
+      return a.year < b.year ? 1 : -1;
+    });
+    return groups;
+  }
+
+  function changeCountLabel(n) {
+    return n + (n === 1 ? " change" : " changes");
+  }
+
+  function renderServiceRow(car, svc) {
+    const bits = [fmtDate(svc.date)];
+    if (hasOdo(svc)) bits.push(fmtOdo(svc.km, svcUnit(svc)));
+    if (svc.shop) bits.push(svc.shop);
+    if (svc.cost !== null && svc.cost !== undefined && svc.cost !== "") bits.push(fmtMoney(svc.cost));
+    const note = svc.notes
+      ? (isFlagNote(svc.notes)
+        ? '<div class="warn">' + esc(svc.notes) + "</div>"
+        : '<div class="notes">' + esc(svc.notes) + "</div>")
+      : "";
+    return '<button class="service-row" type="button" data-action="open-service" data-car="' + esc(car.id) + '" data-id="' + esc(svc.id) + '">' +
+      '<div class="title">' + esc(svc.type) + "</div>" +
+      '<div class="meta">' + esc(bits.join(" · ")) + "</div>" +
+      note +
+      "</button>";
+  }
+
   function intervalInUnit(intervalKm, unit) {
     const n = Number(intervalKm) > 0 ? Number(intervalKm) : 8000;
     if (unit === "mi") return Math.round(n / KM_PER_MILE);
@@ -2192,24 +2244,19 @@
     const notes = (car.notes && String(car.notes).trim())
       ? '<p class="car-notes">' + esc(car.notes) + "</p>"
       : "";
-    const history = services.length
-      ? '<div class="history">' + services.map(function (svc) {
-          const bits = [fmtDate(svc.date)];
-          if (hasOdo(svc)) bits.push(fmtOdo(svc.km, svcUnit(svc)));
-          if (svc.shop) bits.push(svc.shop);
-          if (svc.cost !== null && svc.cost !== undefined && svc.cost !== "") bits.push(fmtMoney(svc.cost));
-          const note = svc.notes
-            ? (isFlagNote(svc.notes)
-              ? '<div class="warn">' + esc(svc.notes) + "</div>"
-              : '<div class="notes">' + esc(svc.notes) + "</div>")
-            : "";
-          return '<button class="service-row" type="button" data-action="open-service" data-car="' + esc(car.id) + '" data-id="' + esc(svc.id) + '">' +
-            '<div class="title">' + esc(svc.type) + "</div>" +
-            '<div class="meta">' + esc(bits.join(" · ")) + "</div>" +
-            note +
-            "</button>";
-        }).join("") + "</div>"
-      : '<div class="empty"><strong>No services yet</strong>Log an oil change, rotation, or other work.</div>';
+    const oilServices = services.filter(isOil);
+    const otherServices = services.filter(function (svc) { return !isOil(svc); });
+    const oilHistory = oilServices.length
+      ? groupByYear(oilServices).map(function (g) {
+          return '<div class="year-group">' +
+            '<div class="year-head"><span class="yr">' + esc(g.year) + "</span> · " + esc(changeCountLabel(g.items.length)) + "</div>" +
+            '<div class="history">' + g.items.map(function (svc) { return renderServiceRow(car, svc); }).join("") + "</div>" +
+            "</div>";
+        }).join("")
+      : (otherServices.length ? "" : '<div class="empty"><strong>No services yet</strong>Log an oil change, rotation, or other work.</div>');
+    const otherHistory = otherServices.length
+      ? '<div class="history">' + otherServices.map(function (svc) { return renderServiceRow(car, svc); }).join("") + "</div>"
+      : "";
 
     const partsList = sortedParts(car);
     const totals = {};
@@ -2257,8 +2304,12 @@
       '<div class="hint">' + esc(dueHint) + (remain ? " · " + remain : "") + "</div></div>" +
       "</div>" +
       specs + notes +
-      '<div class="section-head"><h2>History</h2><span class="count">' + services.length + "</span></div>" +
-      history +
+      (oilServices.length
+        ? '<div class="section-head"><h2>Oil changes</h2><span class="count">' + oilServices.length + "</span></div>" + oilHistory
+        : oilHistory) +
+      (otherServices.length
+        ? '<div class="section-head"' + (oilServices.length ? ' style="margin-top:28px"' : "") + '><h2>Other services</h2><span class="count">' + otherServices.length + "</span></div>" + otherHistory
+        : "") +
       '<div class="fab-wrap"><button class="btn btn-primary" type="button" data-action="add-service" data-id="' + esc(car.id) + '">' + ICONS.plus + " Add service</button></div>" +
       '<div class="section-head" style="margin-top:28px"><h2>Parts bought</h2><span class="count">' + partsList.length + "</span></div>" +
       partsTotal + partsHtml +

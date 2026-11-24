@@ -274,6 +274,24 @@
     .btn-row.inline .btn { flex: 1; }
 
     .fab-wrap { margin-top: 16px; }
+    .page.has-fab { padding-bottom: calc(108px + var(--safe-b)); }
+    .oil-fab {
+      position: fixed;
+      right: calc(16px + var(--safe-r));
+      bottom: calc(20px + var(--safe-b));
+      z-index: 30;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #1a1408;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .oil-fab svg { width: 28px; height: 28px; }
+    .oil-fab:active { transform: scale(0.96); }
     .part-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .part-head .price { font-weight: 650; white-space: nowrap; font-size: 14px; }
     .parts-total {
@@ -325,7 +343,7 @@
       width: 100%;
       outline: none;
     }
-    label.field input:focus, label.field textarea:focus {
+    label.field input:focus, label.field textarea:focus, label.field select:focus {
       border-color: var(--gold);
       box-shadow: 0 0 0 3px var(--warn-bg);
     }
@@ -2164,10 +2182,12 @@
     const h = (location.hash || "#/").replace(/^#/, "");
     const parts = h.split("/").filter(Boolean);
     if (!parts.length) return { name: "home" };
+    if (parts[0] === "oil" && parts[1] === "new") return { name: "oil-new", carId: null };
     if (parts[0] === "car" && parts[1] === "new") return { name: "car-edit", carId: null };
     if (parts[0] === "car" && parts[1]) {
       const carId = parts[1];
       if (parts[2] === "edit") return { name: "car-edit", carId: carId };
+      if (parts[2] === "oil" && parts[3] === "new") return { name: "oil-new", carId: carId };
       if (parts[2] === "service" && parts[3] === "new") return { name: "service-edit", carId: carId, svcId: null };
       if (parts[2] === "service" && parts[3] && parts[4] === "edit") return { name: "service-edit", carId: carId, svcId: parts[3] };
       if (parts[2] === "service" && parts[3]) return { name: "service-edit", carId: carId, svcId: parts[3] };
@@ -2223,7 +2243,7 @@
       ? '<div class="install-tip" id="install-tip"><strong>Add this to your Home Screen.</strong> Tap the Share button, then <span class="share">Add to Home Screen</span>. Your data stays on this phone. <button type="button" data-action="dismiss-tip" style="display:block;margin-top:8px;color:var(--gold);font-weight:620">Got it</button></div>'
       : "";
 
-    return '<div class="page">' +
+    return '<div class="page has-fab">' +
       '<header class="topbar">' +
       '<div class="brand-block"><div class="eyebrow">Service log</div><h1>Garage</h1></div>' +
       '<div class="actions">' +
@@ -2308,7 +2328,7 @@
         }).join("") + "</div>"
       : '<div class="empty"><strong>No parts yet</strong>Log parts you bought for this car.</div>';
 
-    return '<div class="page">' +
+    return '<div class="page has-fab">' +
       '<header class="topbar">' +
       '<button class="back-label" type="button" data-action="home">' + ICONS.back + " Garage</button>" +
       '<div class="actions">' + iconBtn("edit-car", '<span style="font-size:13px;font-weight:700">Edit</span>', "Edit car", ' data-id="' + esc(car.id) + '" style="width:auto;padding:0 14px;border-radius:22px;font-variant:none"') + "</div>" +
@@ -2357,6 +2377,75 @@
       '<label><input type="radio" name="unit" value="km"' + (km ? " checked" : "") + "> km</label>" +
       '<label><input type="radio" name="unit" value="mi"' + (km ? "" : " checked") + "> mi</label>" +
       "</div></div>";
+  }
+
+  function oilDefaults(car) {
+    if (!car) return { oil: "", litres: "" };
+    if (car.id === "car-tundra") return { oil: "Liqui Moly Special Tec AA 0W-20", litres: "" };
+    if (car.id === "car-bmw-530xi") return { oil: "5W-30", litres: "6.5" };
+    if (car.id === "car-ridgeline") return { oil: "Liqui Moly 0W-20", litres: "" };
+    const specs = car.specs || "";
+    const m = /(?:^|\n)Oil:\s*(.+)/i.exec(specs);
+    if (m) return { oil: m[1].trim(), litres: "" };
+    return { oil: "", litres: "" };
+  }
+
+  function composeOilNotes(oil, litres, filter, notes) {
+    const parts = [];
+    if (oil) parts.push(oil);
+    if (litres !== "" && litres != null && litres !== undefined) parts.push(String(litres) + " L");
+    if (filter) parts.push("Filter: " + filter);
+    if (notes) parts.push(notes);
+    return parts.join(" · ");
+  }
+
+  function renderOilFab(carId) {
+    return '<button class="oil-fab" type="button" data-action="add-oil"' +
+      (carId ? ' data-id="' + esc(carId) + '"' : "") +
+      ' aria-label="Add oil change" title="Add oil change">' + ICONS.plus + "</button>";
+  }
+
+  function renderOilForm(carId) {
+    const selected = carId && findCar(carId) ? carId : "";
+    const defaults = oilDefaults(findCar(selected));
+    const back = selected ? "#/car/" + selected : "#/";
+    const options = ['<option value="" disabled' + (selected ? "" : " selected") + ">Select a vehicle</option>"].concat(
+      (db.cars || []).map(function (c) {
+        return '<option value="' + esc(c.id) + '"' + (c.id === selected ? " selected" : "") + ">" + esc(c.name) + "</option>";
+      })
+    );
+    return '<div class="sheet-backdrop" data-go="' + esc(back) + '">' +
+      '<form class="sheet" data-form="oil" data-stop="1">' +
+      '<div class="grab"></div><h2>Add oil change</h2>' +
+      '<div class="form-stack">' +
+      '<label class="field">Vehicle<select name="carId" required>' + options.join("") + "</select></label>" +
+      field("date", "Date", 'type="date" required', todayISO()) +
+      field("km", "Odometer (km)", 'type="number" min="0" step="1" inputmode="numeric" placeholder="Optional"', "") +
+      field("oil", "Oil brand / type", 'type="text" placeholder="e.g. Liqui Moly Special Tec AA 0W-20" autocomplete="off"', defaults.oil) +
+      field("litres", "Amount (litres)", 'type="number" min="0" step="0.1" inputmode="decimal" placeholder="Optional"', defaults.litres) +
+      field("filter", "Filter", 'type="text" placeholder="Optional" autocomplete="off"', "") +
+      field("cost", "Cost (CAD)", 'type="number" min="0" step="0.01" inputmode="decimal" placeholder="Optional"', "") +
+      field("notes", "Notes", 'rows="3" placeholder="Optional"', "", "textarea") +
+      "</div>" +
+      '<div class="btn-row"><button class="btn btn-primary" type="submit">Save</button>' +
+      '<button class="btn btn-ghost" type="button" data-action="nav" data-href="' + esc(back) + '">Cancel</button>' +
+      "</div></form></div>";
+  }
+
+  function bindOilForm() {
+    const form = document.querySelector('form[data-form="oil"]');
+    if (!form) return;
+    const vehicle = form.querySelector('[name="carId"]');
+    const oil = form.querySelector('[name="oil"]');
+    const litres = form.querySelector('[name="litres"]');
+    if (!vehicle || !oil || !litres) return;
+    let last = oilDefaults(findCar(vehicle.value));
+    vehicle.addEventListener("change", function () {
+      const next = oilDefaults(findCar(vehicle.value));
+      if (!oil.value.trim() || oil.value.trim() === last.oil) oil.value = next.oil;
+      if (!litres.value.trim() || litres.value.trim() === last.litres) litres.value = next.litres;
+      last = next;
+    });
   }
 
   function renderCarForm(carId) {
@@ -2473,9 +2562,11 @@
     applyTheme();
     const r = route();
     let html = "";
-    if (r.name === "home") html = renderHome();
-    else if (r.name === "car") html = renderCar(r.carId);
-    else if (r.name === "car-edit") {
+    if (r.name === "home") html = renderHome() + renderOilFab("");
+    else if (r.name === "car") html = renderCar(r.carId) + renderOilFab(r.carId);
+    else if (r.name === "oil-new") {
+      html = (r.carId && findCar(r.carId) ? renderCar(r.carId) : renderHome()) + renderOilForm(r.carId);
+    } else if (r.name === "car-edit") {
       html = (r.carId ? renderCar(r.carId) : renderHome()) + renderCarForm(r.carId);
     } else if (r.name === "service-edit") {
       html = renderServiceForm(r.carId, r.svcId);
@@ -2484,6 +2575,7 @@
     } else html = renderHome();
     html += renderConfirm();
     document.getElementById("app").innerHTML = html;
+    bindOilForm();
   }
 
   function askConfirm(opts) {
@@ -2528,6 +2620,42 @@
       persist();
       go("#/car/" + newId);
     }
+  }
+
+  function onSubmitOil(form) {
+    const carId = form.carId.value;
+    const car = findCar(carId);
+    if (!car) return;
+    const date = form.date.value || "";
+    const kmRaw = form.km.value.trim();
+    const km = kmRaw === "" ? null : Number(kmRaw);
+    const oil = form.oil.value.trim();
+    const litresRaw = form.litres.value.trim();
+    const litres = litresRaw === "" ? null : Number(litresRaw);
+    const filter = form.filter.value.trim();
+    const costRaw = form.cost.value.trim();
+    const cost = costRaw === "" ? null : Number(costRaw);
+    const notes = form.notes.value.trim();
+    if (km !== null && (Number.isNaN(km) || km < 0)) return;
+    if (litres !== null && (Number.isNaN(litres) || litres < 0)) return;
+    if (cost !== null && Number.isNaN(cost)) return;
+    const rec = {
+      id: uid(),
+      date: date || null,
+      type: "Oil Change",
+      shop: "",
+      km: km,
+      unit: "km",
+      cost: (cost === null || Number.isNaN(cost) ? null : cost),
+      notes: composeOilNotes(oil, (litres === null || Number.isNaN(litres) ? "" : litres), filter, notes),
+      oilBrand: oil,
+      litres: (litres === null || Number.isNaN(litres) ? null : litres),
+      filter: filter
+    };
+    car.services = car.services || [];
+    car.services.push(rec);
+    persist();
+    go("#/car/" + carId);
   }
 
   function onSubmitService(form) {
@@ -2732,6 +2860,7 @@
     else if (action === "nav") go(el.getAttribute("data-href") || "#/");
     else if (action === "add-car") go("#/car/new");
     else if (action === "edit-car") go("#/car/" + id + "/edit");
+    else if (action === "add-oil") go(id ? "#/car/" + id + "/oil/new" : "#/oil/new");
     else if (action === "add-service") go("#/car/" + id + "/service/new");
     else if (action === "open-service") go("#/car/" + el.getAttribute("data-car") + "/service/" + id + "/edit");
     else if (action === "delete-car") deleteCar(id);
@@ -2764,6 +2893,7 @@
     if (form.getAttribute("data-form") === "car") onSubmitCar(form);
     if (form.getAttribute("data-form") === "service") onSubmitService(form);
     if (form.getAttribute("data-form") === "part") onSubmitPart(form);
+    if (form.getAttribute("data-form") === "oil") onSubmitOil(form);
   });
 
   document.getElementById("import-file").addEventListener("change", function (e) {
